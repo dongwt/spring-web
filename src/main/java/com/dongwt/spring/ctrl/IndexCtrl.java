@@ -17,13 +17,13 @@ import com.dongwt.spring.service.RedisService;
 @RequestMapping("/")
 public class IndexCtrl {
 
-	@Autowired
-	private RedisService RedisService;
+//	@Autowired
+//	private RedisService RedisService;
 	
 	@RequestMapping(value="/index",method={RequestMethod.GET})
 	public @ResponseBody Map<String,Object> index(HttpServletRequest request) {
 		Map<String,Object> result = new HashMap<String, Object>();
-		RedisService.save("str", (String) request.getParameter("str"));
+//		RedisService.save("str", (String) request.getParameter("str"));
 		result.put("status", 0);
 		result.put("msg", "success");
 		return result;
