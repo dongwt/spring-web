@@ -5,12 +5,16 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.dongwt.spring.model.ExcelObj;
 import com.dongwt.spring.utils.ExcelUtils;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = AppTestConfig.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = AppTestConfig.class)
 public class ExportExcelTest {
     
     private String[] titles;
@@ -42,7 +46,13 @@ public class ExportExcelTest {
     
     @Test
     public void download(){
-        
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        try {
+            ExcelUtils.download(response, "excel", ExcelObj.class, titles, dataList);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
