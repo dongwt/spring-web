@@ -50,14 +50,15 @@ public class ExcelUtils {
             Object value = field.get(obj);
             //日期
             if (value instanceof Date) {
-                DateTimeFormat dateTimeFormat = field.getAnnotation(DateTimeFormat.class);
-                if(null != dateTimeFormat && !"".equals(dateTimeFormat.pattern())){
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateTimeFormat.pattern());
+                OperateField operateField = field.getAnnotation(OperateField.class);
+                if(null != operateField && !"".equals(operateField.datePattern())){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(operateField.datePattern());
                     result = simpleDateFormat.format(value);
                 }
             }
             else if (value instanceof Boolean) {
-
+                OperateField operateField = field.getAnnotation(OperateField.class);
+                result = (Boolean)value == true ? operateField.trueValue():operateField.falseValue();
             }
             else if (value instanceof Integer) {
                 result = String.valueOf(value);
@@ -96,16 +97,32 @@ public class ExcelUtils {
      * @param titles
      * @return
      */
-    public static HSSFWorkbook createHeader(HSSFWorkbook workBook, String[] titles) {
-        if (null == titles || titles.length == 0) {
-            throw new RuntimeException("titles 不能为空!");
-        }
+    public static <T> HSSFWorkbook createHeader(HSSFWorkbook workBook, Class<T> clazz) {
+        List<String> titles = new ArrayList<String>();
+        Field[] fields = clazz.getDeclaredFields();
         HSSFSheet sheet = workBook.createSheet();
         HSSFRow row = sheet.createRow(0);
-        for (int i = 0; i < titles.length; i++) {
-            HSSFCell cell = row.createCell(i);
+        for(Field field : fields){
+            field.setAccessible(true);
+            OperateField operateField = field.getAnnotation(OperateField.class);
+            HSSFCell cell = row.createCell(titles.size());
             cell.setCellType(XSSFCell.CELL_TYPE_STRING);
-            cell.setCellValue(titles[i]);
+            if (null != operateField) {
+                //如果该字段没有被排除
+                if(!operateField.isExclude()){
+                    if ("".equals(operateField.name())) {
+                        titles.add(field.getName());
+                        cell.setCellValue(field.getName());
+                    }else{
+                        titles.add(operateField.name());
+                        cell.setCellValue(operateField.name());
+                    } 
+                }
+            }
+            else {
+                titles.add(field.getName());
+                cell.setCellValue(field.getName());
+            }
         }
         return workBook;
     }
@@ -134,17 +151,19 @@ public class ExcelUtils {
             List<String> values = new ArrayList<String>();
             for (Field field : fields) {
                 field.setAccessible(true);
-                StringBuffer value = new StringBuffer(formatField(dataList.get(i),field));
+                StringBuffer value = new StringBuffer();
                 OperateField operateField = field.getAnnotation(OperateField.class);
-                //如果该字段没有被排除
                 if (null != operateField) {
+                    //如果该字段没有被排除
                     if (!operateField.isExclude()) {
+                        value.append(formatField(dataList.get(i),field));
                         value.insert(0, operateField.prefix());
                         value.append(operateField.suffix());
                         values.add(value.toString());
                     }
                 }
                 else {
+                    value.append(formatField(dataList.get(i),field));
                     values.add(value.toString());
                 }
             }
@@ -216,9 +235,9 @@ public class ExcelUtils {
     * @param dataList
     * @throws IOException
     */
-    public static <T> void exportFile(String fileName, Class<T> clazz, String[] titles, List<T> dataList) throws Exception {
+    public static <T> void exportFile(String fileName, Class<T> clazz,List<T> dataList) throws Exception {
         HSSFWorkbook workBook = new HSSFWorkbook();
-        createHeader(workBook, titles);
+        createHeader(workBook, clazz);
         createBody(workBook, clazz, dataList);
         outputFile(workBook, fileName);
     }
@@ -239,10 +258,10 @@ public class ExcelUtils {
     * @param dataList
     * @throws IOException
     */
-    public static <T> void download(HttpServletResponse response, String fileName, Class<T> clazz, String[] titles, List<T> dataList)
+    public static <T> void download(HttpServletResponse response, String fileName, Class<T> clazz, List<T> dataList)
             throws Exception {
         HSSFWorkbook workBook = new HSSFWorkbook();
-        createHeader(workBook, titles);
+        createHeader(workBook, clazz);
         createBody(workBook, clazz, dataList);
         outputWeb(workBook, response, fileName);
     }

@@ -8,19 +8,22 @@ import com.dongwt.spring.annotation.OperateField;
 
 public class ExcelObj {
     
-    @OperateField(prefix="[",suffix="]")
+    @OperateField(name="用户名",prefix="[",suffix="]")
     private String userName;//用户名
     
-    @OperateField(isExclude=false)
+    @OperateField(name="年龄",isExclude=true)
     private Integer age;//年龄
     
-    private String sex;//性别
+    @OperateField(name="性别",trueValue="男",falseValue="女")
+    private Boolean sex;//性别
     
+    @OperateField(name="手机号",isExclude=true)
     private String phone;//手机号
     
+    @OperateField(name="地址",isExclude=true)
     private String address;//地址
     
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @OperateField(name="",datePattern="yyyy-MM-dd hh:mm:ss")
     private Date birthday;//出生日期
     
 
@@ -29,7 +32,7 @@ public class ExcelObj {
     
     
 
-    public ExcelObj(String userName, Integer age, String sex, String phone, String address,Date birthday) {
+    public ExcelObj(String userName, Integer age, Boolean sex, String phone, String address,Date birthday) {
         this.userName = userName;
         this.age = age;
         this.sex = sex;
@@ -56,11 +59,11 @@ public class ExcelObj {
         this.age = age;
     }
 
-    public String getSex() {
+    public Boolean getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(Boolean sex) {
         this.sex = sex;
     }
 

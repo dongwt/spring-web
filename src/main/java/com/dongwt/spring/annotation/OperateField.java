@@ -23,4 +23,12 @@ public @interface OperateField {
     String prefix() default  "";//默认前缀
    
     String suffix() default "";//默认后缀
+    
+    String name() default "";//名称
+    
+    String datePattern() default "yyyy-MM-dd hh:mm:ss";//日期格式
+    
+    String trueValue() default "是";//boolean true
+    
+    String falseValue() default "否";//boolean false
 }
