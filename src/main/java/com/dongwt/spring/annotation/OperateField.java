@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  *
  * @see
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OperateField {
     

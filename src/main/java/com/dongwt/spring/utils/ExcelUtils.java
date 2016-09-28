@@ -15,7 +15,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 
 import com.dongwt.spring.annotation.OperateField;
@@ -73,7 +72,7 @@ public class ExcelUtils {
      * @return
      * @throws Exception
      */
-    public static HSSFWorkbook createBody(HSSFWorkbook workBook, Class<T> clazz, List<T> dataList) throws Exception {
+    public static <T> HSSFWorkbook createBody(HSSFWorkbook workBook, Class<T> clazz, List<T> dataList) throws Exception {
         Field[] fields = clazz.getDeclaredFields();
 
         for (int i = 0; i < dataList.size(); i++) {
@@ -82,14 +81,18 @@ public class ExcelUtils {
             List<String> values = new ArrayList<String>();
             for (Field field : fields) {
                 field.setAccessible(true);
-                StringBuffer value = new StringBuffer((String) field.get(dataList.get(i)));
+                StringBuffer value = new StringBuffer(String.valueOf(field.get(dataList.get(i))));
                 OperateField operateField = field.getAnnotation(OperateField.class);
                 //如果该字段没有被排除
-                if (!operateField.isExclude()) {
-                    value.append(operateField.prefix(), 0, operateField.prefix().length());
-                    value.append(operateField.suffix());
+                if (null != operateField) {
+                    if(!operateField.isExclude()){
+                        value.insert(0,operateField.prefix());
+                        value.append(operateField.suffix());
+                        values.add(value.toString());
+                    }
+                }else{
+                    values.add(value.toString());
                 }
-                values.add(value.toString());
             }
 
             for (int j = 0; j < values.size(); j++) {
@@ -144,38 +147,48 @@ public class ExcelUtils {
         workBook.write(output);
     }
 
-    /**
-     * 
-     * 功能描述:导出到文件
-     *
-     * <pre>
-     * Modify Reason:(修改原因,不需覆盖，直接追加.)
-     *     Administrator:   2016年9月28日      新建
-     * </pre>
-     *
-     * @param fileName
-     * @throws IOException
-     */
-    public static void exportFile(String fileName) throws IOException {
+   /**
+    * 
+    * 功能描述:导出文件
+    *
+    * <pre>
+    * Modify Reason:(修改原因,不需覆盖，直接追加.)
+    *     dongwt:   2016年9月28日      新建
+    * </pre>
+    *
+    * @param fileName
+    * @param clazz
+    * @param titles
+    * @param dataList
+    * @throws IOException
+    */
+    public static <T> void exportFile(String fileName, Class<T> clazz, String[] titles, List<T> dataList) throws Exception {
         HSSFWorkbook workBook = new HSSFWorkbook();
+        createHeader(workBook, titles);
+        createBody(workBook, clazz, dataList);
         outputFile(workBook, fileName);
     }
 
-    /**
-     * 
-     * 功能描述:下载
-     *
-     * <pre>
-     * Modify Reason:(修改原因,不需覆盖，直接追加.)
-     *     dongwt:   2016年9月28日      新建
-     * </pre>
-     *
-     * @param response
-     * @param fileName
-     * @throws IOException
-     */
-    public static void download(HttpServletResponse response, String fileName) throws IOException {
+   /**
+    * 
+    * 功能描述:下载
+    *
+    * <pre>
+    * Modify Reason:(修改原因,不需覆盖，直接追加.)
+    *     dongwt:   2016年9月28日      新建
+    * </pre>
+    *
+    * @param response
+    * @param fileName
+    * @param clazz
+    * @param titles
+    * @param dataList
+    * @throws IOException
+    */
+    public static <T> void download(HttpServletResponse response, String fileName, Class<T> clazz, String[] titles, List<T> dataList) throws Exception {
         HSSFWorkbook workBook = new HSSFWorkbook();
+        createHeader(workBook, titles);
+        createBody(workBook, clazz, dataList);
         outputWeb(workBook, response, fileName);
     }
 
