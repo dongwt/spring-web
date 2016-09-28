@@ -16,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.dongwt.spring.annotation.OperateField;
 
@@ -29,6 +30,58 @@ import com.dongwt.spring.annotation.OperateField;
  * @see
  */
 public class ExcelUtils {
+
+    /**
+     * 
+     * 功能描述:格式化字段
+     *
+     * <pre>
+     * Modify Reason:(修改原因,不需覆盖，直接追加.)
+     *     dongwt:   2016年9月28日      新建
+     * </pre>
+     *
+     * @param obj
+     * @param field
+     * @return
+     */
+    private static String formatField(Object obj, Field field) {
+        String result = "";
+        try {
+            Object value = field.get(obj);
+            //日期
+            if (value instanceof Date) {
+                DateTimeFormat dateTimeFormat = field.getAnnotation(DateTimeFormat.class);
+                if(null != dateTimeFormat && !"".equals(dateTimeFormat.pattern())){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateTimeFormat.pattern());
+                    result = simpleDateFormat.format(value);
+                }
+            }
+            else if (value instanceof Boolean) {
+
+            }
+            else if (value instanceof Integer) {
+                result = String.valueOf(value);
+            }
+            else if (value instanceof Float) {
+                result = String.valueOf(value);
+            }
+            else if (value instanceof Double) {
+                result = String.valueOf(value);
+            }
+            else if (value instanceof String) {
+                result = (String) value;
+            }else{
+               result = "未知类型"; 
+            }
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 
@@ -81,16 +134,17 @@ public class ExcelUtils {
             List<String> values = new ArrayList<String>();
             for (Field field : fields) {
                 field.setAccessible(true);
-                StringBuffer value = new StringBuffer(String.valueOf(field.get(dataList.get(i))));
+                StringBuffer value = new StringBuffer(formatField(dataList.get(i),field));
                 OperateField operateField = field.getAnnotation(OperateField.class);
                 //如果该字段没有被排除
                 if (null != operateField) {
-                    if(!operateField.isExclude()){
-                        value.insert(0,operateField.prefix());
+                    if (!operateField.isExclude()) {
+                        value.insert(0, operateField.prefix());
                         value.append(operateField.suffix());
                         values.add(value.toString());
                     }
-                }else{
+                }
+                else {
                     values.add(value.toString());
                 }
             }
@@ -147,7 +201,7 @@ public class ExcelUtils {
         workBook.write(output);
     }
 
-   /**
+    /**
     * 
     * 功能描述:导出文件
     *
@@ -169,7 +223,7 @@ public class ExcelUtils {
         outputFile(workBook, fileName);
     }
 
-   /**
+    /**
     * 
     * 功能描述:下载
     *
@@ -185,7 +239,8 @@ public class ExcelUtils {
     * @param dataList
     * @throws IOException
     */
-    public static <T> void download(HttpServletResponse response, String fileName, Class<T> clazz, String[] titles, List<T> dataList) throws Exception {
+    public static <T> void download(HttpServletResponse response, String fileName, Class<T> clazz, String[] titles, List<T> dataList)
+            throws Exception {
         HSSFWorkbook workBook = new HSSFWorkbook();
         createHeader(workBook, titles);
         createBody(workBook, clazz, dataList);

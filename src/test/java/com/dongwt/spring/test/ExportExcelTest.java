@@ -1,6 +1,7 @@
 package com.dongwt.spring.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,13 +24,13 @@ public class ExportExcelTest {
     
     @Before
     public void before(){
-        titles = new String[]{"用户名","年龄","性别","手机号","地址"};
+        titles = new String[]{"用户名","年龄","性别","手机号","地址","生日"};
         dataList = new ArrayList<ExcelObj>();
-        dataList.add(new ExcelObj("aaa", 12, "男", "110-aaa", "上海-aaa"));
-        dataList.add(new ExcelObj("bbb", 12, "男", "110-bbb", "上海-bbb"));
-        dataList.add(new ExcelObj("ccc", 12, "男", "110-ccc", "上海-ccc"));
-        dataList.add(new ExcelObj("ddd", 12, "男", "110-ddd", "上海-ddd"));
-        dataList.add(new ExcelObj("eee", 12, "男", "110-eee", "上海-eee"));
+        dataList.add(new ExcelObj("aaa", 12, "男", "110-aaa", "上海-aaa",new Date()));
+        dataList.add(new ExcelObj("bbb", 12, "男", "110-bbb", "上海-bbb",new Date()));
+        dataList.add(new ExcelObj("ccc", 12, "男", "110-ccc", "上海-ccc",new Date()));
+        dataList.add(new ExcelObj("ddd", 12, "男", "110-ddd", "上海-ddd",new Date()));
+        dataList.add(new ExcelObj("eee", 12, "男", "110-eee", "上海-eee",new Date()));
     }
     
     

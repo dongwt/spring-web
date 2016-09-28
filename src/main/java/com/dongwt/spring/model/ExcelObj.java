@@ -1,5 +1,9 @@
 package com.dongwt.spring.model;
 
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.dongwt.spring.annotation.OperateField;
 
 public class ExcelObj {
@@ -16,18 +20,22 @@ public class ExcelObj {
     
     private String address;//地址
     
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private Date birthday;//出生日期
+    
 
     public ExcelObj() {
     }
     
     
 
-    public ExcelObj(String userName, Integer age, String sex, String phone, String address) {
+    public ExcelObj(String userName, Integer age, String sex, String phone, String address,Date birthday) {
         this.userName = userName;
         this.age = age;
         this.sex = sex;
         this.phone = phone;
         this.address = address;
+        this.birthday = birthday;
     }
 
 
@@ -71,5 +79,19 @@ public class ExcelObj {
     public void setAddress(String address) {
         this.address = address;
     }
+
+
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+    
+    
 
 }
