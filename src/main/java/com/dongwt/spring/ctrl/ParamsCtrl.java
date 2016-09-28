@@ -14,7 +14,7 @@ import com.dongwt.spring.model.ParamsObj;
 
 @Controller
 @RequestMapping("/params")
-public class ParamsCtrl {
+public class ParamsCtrl extends BaseCtrl{
     
     @RequestMapping(value="/arrayTest",method=RequestMethod.POST)
     @ResponseBody
