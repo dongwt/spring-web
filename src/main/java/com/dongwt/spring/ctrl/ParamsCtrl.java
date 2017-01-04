@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dongwt.spring.model.DateObj;
 import com.dongwt.spring.model.ParamsObj;
 
 @Controller
@@ -66,6 +67,12 @@ public class ParamsCtrl extends BaseCtrl{
     @ResponseBody
     public Set<Integer> objectSetTest(@RequestBody ParamsObj paramsObj){
         return paramsObj.getSet();
+    }
+    
+    @RequestMapping(value="/dateTest",method=RequestMethod.POST)
+    @ResponseBody
+    public DateObj dateTest(@RequestBody DateObj paramsObj){
+        return paramsObj;
     }
 
 }
